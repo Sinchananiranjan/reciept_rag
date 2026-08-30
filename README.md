@@ -1,4 +1,4 @@
-# ReceiptRAG 🧾⚡
+# 🧾 ReceiptRAG — AI-Powered Receipt & Invoice Intelligence
 
 ReceiptRAG is an enterprise-grade AI-powered receipt and document intelligence application. It enables users to upload purchase receipts, invoices, and bills (JPG, PNG, PDF), run modular OCR with image preprocessing, extract structured JSON metadata, index text chunks into a vector database with strict multi-tenant user isolation, ask natural-language RAG questions with source citations, and explore dynamic spending analytics.
 
@@ -211,6 +211,71 @@ docker compose up -d --build
 - Frontend: `http://localhost:3000`
 - Backend API: `http://localhost:8000`
 - PostgreSQL + pgvector: `localhost:5432`
+
+---
+
+## 🚀 Free Deployment Guide (Neon + Render + Vercel)
+
+Deploy the full stack for **$0/month** using three free-tier services. No credit card required.
+
+| Service | Role | Free Limits |
+|---------|------|------------|
+| [Neon.tech](https://neon.tech) | PostgreSQL Database | 512 MB storage |
+| [Render.com](https://render.com) | Backend API (Docker) | Sleeps after 15 min inactivity |
+| [Vercel.com](https://vercel.com) | Frontend (Static) | Unlimited bandwidth |
+
+### Step 1 — Database on Neon
+
+1. Sign up at [neon.tech](https://neon.tech).
+2. Create a new **Project** → copy the **Connection String**:
+   ```
+   postgresql://user:password@ep-xxxx.aws.neon.tech/neondb?sslmode=require
+   ```
+
+### Step 2 — Backend on Render
+
+1. Push the repository to GitHub.
+2. Sign up at [render.com](https://render.com) with GitHub.
+3. Click **New +** → **Web Service** → connect your repo.
+4. Set:
+   - **Language:** Docker
+   - **Root Directory:** `backend`
+   - **Instance Type:** Free
+5. Add **Environment Variables** under Advanced:
+
+   | Key | Value |
+   |-----|-------|
+   | `DATABASE_URL` | Your Neon connection string |
+   | `SECRET_KEY` | A strong random secret (change from default!) |
+   | `OPENAI_API_KEY` | *(Optional)* — app works offline without it |
+
+6. Click **Create Web Service**. Note your URL (e.g., `https://receiptrag-api.onrender.com`).
+
+> ⚠️ The free Render tier sleeps after 15 minutes of inactivity. First request after sleep takes ~30 seconds. Your Neon database data is always persistent.
+
+### Step 3 — Frontend on Vercel
+
+1. Sign up at [vercel.com](https://vercel.com) with GitHub.
+2. Click **Add New** → **Project** → import your repo.
+3. Set:
+   - **Framework Preset:** Vite (auto-detected)
+   - **Root Directory:** `frontend`
+4. Add **Environment Variable**:
+
+   | Key | Value |
+   |-----|-------|
+   | `VITE_API_URL` | `https://your-app-name.onrender.com/api` |
+
+5. Click **Deploy**. Your app is live at `https://your-app.vercel.app`!
+
+### Known Issues & Fixes
+
+| Issue | Fix |
+|-------|-----|
+| `ModuleNotFoundError: psycopg2` | Add `psycopg2-binary` to `requirements.txt` |
+| CORS blocked on register/login | Set `allow_credentials=False` in `main.py` when using `allow_origins=["*"]` |
+| `Property 'env' does not exist on ImportMeta` | Add `"types": ["vite/client"]` to `tsconfig.json` compilerOptions |
+| Render build fails with Tesseract missing | Ensure Dockerfile installs `tesseract-ocr` and `poppler-utils` via apt |
 
 ---
 
