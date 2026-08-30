@@ -19,8 +19,13 @@ app = FastAPI(
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://reciept-rag.vercel.app",
+        "*",  # fallback for any other deployments
+    ],
+    allow_credentials=False,  # False allows wildcard origins; JWT uses Authorization header (not cookies)
     allow_methods=["*"],
     allow_headers=["*"],
 )
